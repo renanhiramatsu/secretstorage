@@ -32,3 +32,42 @@ def getPassword(adminPassword, service):
         passKey = row[0]
 
     return createPassword(passKey, service, adminPassword)
+
+
+def addPassword(service, adminPassword):
+    secret_key = getHexKey(adminPassword, service)
+
+    command = 'INSERT INTO KEYS (PASS_KEY) VALUES (%s);' % (
+        '"' + secret_key + '"')
+    conn.execute(command)
+    conn.commit()
+    return createPassword(secret_key, service, adminPassword)
+
+
+if connect == PASSWORD:
+    try:
+        conn.execute('''CREATE TABLE KEYS
+            (PASS_KEY TEXT PRIMARY KEY NOT NULL);''')
+        print("Your safe has been created!\nWhat would you like to store in it today?")
+    except:
+        print("You have a safe, what would you like to do today?")
+
+    while True:
+        print("\n" + "*"*15)
+        print("Commands:")
+        print("q = quit program")
+        print("gp = get password")
+        print("sp = store password")
+        print("*"*15)
+        input_ = input(":")
+
+        if input_ == "q":
+            break
+        if input_ == "sp":
+            service = input("What is the name of the service?\n")
+            print("\n" + service.capitalize() +
+                  " password created:\n" + addPassword(service, PASSWORD))
+        if input_ == "gp":
+            service = input("What is the name of the service?\n")
+            print("\n" + service.capitalize() +
+                  " password:\n"+getPassword(PASSWORD, service))
